@@ -6,7 +6,7 @@ class Memo {
     const questionText = "Choose a note you want to refer";
     const answer = await this.enquirer(questionText);
     console.log(answer.memo.title);
-    const contentLine = answer.memo.content.split("  |  ");
+    const contentLine = answer.memo.content.split("\n");
     for (let i = 0; i < contentLine.length; i++) {
       console.log(contentLine[i]);
     }
@@ -100,7 +100,9 @@ class StorageDB extends Memo {
   }
 
   deleteData (memoId) {
-    db.run(`DELETE FROM memodb WHERE id = ${memoId}`);
+    const memo = db.prepare("DELETE FROM memodb WHERE id = ?");
+    memo.run(memoId);
+    memo.finalize();
   }
 
   insertData (data) {
@@ -109,7 +111,7 @@ class StorageDB extends Memo {
       console.log("Please enter text on the first line");
       process.exit(1);
     }
-    const content = data.join("  |  ");
+    const content = data.join("\n");
     const memo = db.prepare("INSERT INTO memodb(title, content) VALUES(?, ?)");
     memo.run(title, content);
     memo.finalize();
